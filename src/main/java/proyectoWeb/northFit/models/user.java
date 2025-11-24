@@ -1,41 +1,70 @@
 package proyectoWeb.northFit.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
-public class user {
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nombre;
+
+    @Column(nullable = false, unique = true)
     private String correo;
+
+    @Column(nullable = false)
     private String contrasena;
-    private String rol; // admin, trainer, client
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<payment> pagos;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role rol;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<booking> reservas;
+    private String telefono;
 
-    public user() {}
+    @Column(name = "fecha_registro")
+    private LocalDateTime fechaRegistro;
 
-    // Getters y setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @Column(name = "activo")
+    private Boolean activo = true;
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    // Relaciones
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Payment> pagos;
 
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Booking> reservas;
 
-    public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Client client;
 
-    public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Trainer trainer;
+
+    @PrePersist
+    protected void onCreate() {
+        fechaRegistro = LocalDateTime.now();
+        if (activo == null) {
+            activo = true;
+        }
+    }
+
+    // Enum para roles
+    public enum Role {
+        ADMIN,
+        MANAGER,
+        TRAINER,
+        CLIENT
+    }
 }
