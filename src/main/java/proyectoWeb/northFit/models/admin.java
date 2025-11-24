@@ -1,5 +1,5 @@
 package proyectoWeb.northFit.models;
 
-public class admin {
+public class Admin {
     
 }
