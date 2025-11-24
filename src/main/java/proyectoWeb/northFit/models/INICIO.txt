@@ -1,0 +1,30 @@
+INICIO
+
+  LIMPIAR_PANTALLA
+  MOSTRAR_TITULO("PIANO DIGITAL EN ENSAMBLADOR")
+  MOSTRAR_INSTRUCCIONES("Teclas: A S D F G H J K | ESC para salir")
+
+  MIENTRAS VERDADERO HACER
+      TECLA ← LEER_TECLA()
+      
+      SI TECLA = 'ESC' ENTONCES
+          DETENER_SONIDO()
+          SALIR_DEL_PROGRAMA
+      FIN SI
+
+      SEGÚN TECLA HACER
+          'A' → GENERAR_SONIDO(440 Hz)   // Nota La
+          'S' → GENERAR_SONIDO(494 Hz)   // Nota Si
+          'D' → GENERAR_SONIDO(523 Hz)   // Nota Do
+          'F' → GENERAR_SONIDO(587 Hz)   // Nota Re
+          'G' → GENERAR_SONIDO(659 Hz)   // Nota Mi
+          'H' → GENERAR_SONIDO(698 Hz)   // Nota Fa
+          'J' → GENERAR_SONIDO(784 Hz)   // Nota Sol
+          'K' → GENERAR_SONIDO(880 Hz)   // Nota La (aguda)
+          OTRO → NINGUNO
+      FIN SEGÚN
+
+      MOSTRAR_NOTA_EN_PANTALLA(TECLA)
+  FIN MIENTRAS
+
+FIN
