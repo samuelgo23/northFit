@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - NorthFit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #0099cc;
+            --dark-bg: #1a1a2e;
+            --light-bg: #16213e;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-logo {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .sidebar-title {
+            color: white;
+            font-weight: bold;
+            margin: 10px 0 0 0;
+        }
+
+        .sidebar-subtitle {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            margin: 5px 0 0 0;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 8px 0;
+        }
+
+        .sidebar-nav a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .nav-section {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 10px 15px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .top-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-text {
+            color: white;
+        }
+
+        .welcome-text h2 {
+            margin: 0;
+            font-weight: bold;
+            font-size: 2rem;
+        }
+
+        .welcome-text p {
+            margin: 5px 0 0 0;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .logout-btn {
+            background: rgba(255, 0, 0, 0.2);
+            color: white;
+            border: 2px solid #ff4444;
+            padding: 10px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff4444;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+            border-color: var(--primary-color);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .stat-change.positive {
+            color: #4caf50;
+        }
+
+        .stat-change.negative {
+            color: #f44336;
+        }
+
+        .admin-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-link-card {
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .quick-link-card:hover {
+            background: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            color: white;
+        }
+
+        .quick-link-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            transition: color 0.3s;
+        }
+
+        .quick-link-card:hover .quick-link-icon {
+            color: white;
+        }
+
+        .quick-link-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .activity-content {
+            flex: 1;
+            color: white;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <h3 class="sidebar-title">NorthFit</h3>
+            <p class="sidebar-subtitle">Panel de Administración</p>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <div class="nav-section">Principal</div>
+            <li>
+                <a th:href="@{/manager/dashboard}" class="active">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/manager/reports}">
+                    <i class="fas fa-file-alt"></i> Reportes
+                </a>
+            </li>
+            
+            <div class="nav-section">Gestión</div>
+            <li>
+                <a th:href="@{/manager/users}">
+                    <i class="fas fa-users"></i> Usuarios
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/manager/memberships}">
+                    <i class="fas fa-crown"></i> Membresías
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/manager/bookings}">
+                    <i class="fas fa-calendar-check"></i> Reservas
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="welcome-text">
+                <h2>Panel de Administración 🎯</h2>
+                <p>Resumen general del gimnasio</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <div style="color: white; font-weight: bold;">Administrador</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.85rem;">Manager</div>
+                </div>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" th:text="${totalUsers}">0</div>
+                <div class="stat-label">Usuarios Activos</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +12% este mes
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-value" th:text="${totalMemberships}">0</div>
+                <div class="stat-label">Membresías Activas</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +8% este mes
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-value" th:text="${totalBookings}">0</div>
+                <div class="stat-label">Reservas Totales</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +15% este mes
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value">$2.5M</div>
+                <div class="stat-label">Ingresos del Mes</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +20% este mes
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="admin-section">
+            <h3 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Accesos Rápidos
+            </h3>
+            <div class="quick-links">
+                <a th:href="@{/manager/users/new}" class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="quick-link-title">Nuevo Usuario</div>
+                </a>
+                
+                <a th:href="@{/manager/memberships/new}" class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="quick-link-title">Nueva Membresía</div>
+                </a>
+                
+                <a th:href="@{/manager/users}" class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="quick-link-title">Gestionar Usuarios</div>
+                </a>
+                
+                <a th:href="@{/manager/bookings}" class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="quick-link-title">Ver Reservas</div>
+                </a>
+                
+                <a th:href="@{/manager/reports}" class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="quick-link-title">Reportes</div>
+                </a>
+                
+                <a th:href="@{/manager/memberships}" class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="quick-link-title">Ver Membresías</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="admin-section">
+            <h3 class="section-title">
+                <i class="fas fa-history"></i>
+                Actividad Reciente
+            </h3>
+            
+            <div class="recent-activity">
+                <div class="activity-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Nuevo usuario registrado</div>
+                    <div class="activity-time">Hace 5 minutos</div>
+                </div>
+            </div>
+            
+            <div class="recent-activity">
+                <div class="activity-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Nueva reserva de clase</div>
+                    <div class="activity-time">Hace 15 minutos</div>
+                </div>
+            </div>
+            
+            <div class="recent-activity">
+                <div class="activity-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Pago procesado exitosamente</div>
+                    <div class="activity-time">Hace 1 hora</div>
+                </div>
+            </div>
+            
+            <div class="recent-activity">
+                <div class="activity-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Membresía Premium activada</div>
+                    <div class="activity-time">Hace 2 horas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
