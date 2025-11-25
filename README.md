@@ -3,13 +3,13 @@
 <img src="img/Captura de pantalla 2025-11-25 000511.png" alt="">
 <p>“NorthFit” será una aplicación web diseñada para centralizar la administración de una cadena de gimnasios distribuidos en diferentes ciudades del país.
  El sistema permitirá:
-Gestionar sedes, entrenadores, clases y membresías.
+entrenadores, clases y membresías.
 
 
 Ofrecer a los clientes una plataforma para registrarse, pagar, reservar clases y ver sus beneficios.
 
 
-Servir como página comercial para atraer nuevos clientes, mostrando promociones, ubicación de las sedes y planes disponibles.
+Servir como página comercial para atraer nuevos clientes, mostrando promociones y planes disponibles.
 
 
 El objetivo es mejorar la experiencia del cliente y optimizar la operación interna, permitiendo una administración eficiente de todos los gimnasios desde un único sistema.
