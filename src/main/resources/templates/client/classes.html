@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clases Disponibles - NorthFit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #0099cc;
+            --dark-bg: #1a1a2e;
+            --light-bg: #16213e;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .sidebar-title {
+            color: white;
+            font-weight: bold;
+            margin: 10px 0 0 0;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 10px 0;
+        }
+
+        .sidebar-nav a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        .filters-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn-filter {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-filter:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .class-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .class-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+            border-color: var(--primary-color);
+        }
+
+        .class-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px;
+            color: white;
+        }
+
+        .class-type {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .class-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .class-body {
+            padding: 20px;
+            color: white;
+        }
+
+        .class-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .class-info-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .class-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .capacity-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .capacity-full .capacity-fill {
+            background: linear-gradient(90deg, #f44336, #ff5722);
+        }
+
+        .capacity-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .class-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .class-difficulty {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .difficulty-PRINCIPIANTE {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+
+        .difficulty-INTERMEDIO {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        .difficulty-AVANZADO {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .btn-book {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-book:hover:not(:disabled) {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .btn-book:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            color: rgba(0, 212, 255, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <h3 class="sidebar-title">NorthFit</h3>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li>
+                <a th:href="@{/client/dashboard}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/classes}" class="active">
+                    <i class="fas fa-calendar-alt"></i> Clases Disponibles
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/bookings}">
+                    <i class="fas fa-ticket-alt"></i> Mis Reservas
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/memberships}">
+                    <i class="fas fa-crown"></i> Membresías
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/profile}">
+                    <i class="fas fa-user"></i> Mi Perfil
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-calendar-alt"></i>
+                Clases Disponibles
+            </h1>
+            <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.7);">
+                Encuentra la clase perfecta para ti
+            </p>
+        </div>
+
+        <!-- Alerts -->
+        <div th:if="${param.success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            ¡Reserva realizada exitosamente!
+        </div>
+
+        <div th:if="${param.error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${param.error}">Error al realizar la reserva</span>
+        </div>
+
+        <!-- Filters (opcional - puedes implementarlo después) -->
+        <!--
+        <div class="filters-section">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label class="filter-label">Tipo de Clase</label>
+                    <select class="filter-select">
+                        <option value="">Todas</option>
+                        <option value="YOGA">Yoga</option>
+                        <option value="SPINNING">Spinning</option>
+                        <option value="CROSSFIT">CrossFit</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Nivel</label>
+                    <select class="filter-select">
+                        <option value="">Todos</option>
+                        <option value="PRINCIPIANTE">Principiante</option>
+                        <option value="INTERMEDIO">Intermedio</option>
+                        <option value="AVANZADO">Avanzado</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <button class="btn-filter">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+        -->
+
+        <!-- Classes Grid -->
+        <div th:if="${classes.isEmpty()}" class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No hay clases disponibles en este momento</h3>
+            <p>Vuelve más tarde para ver las nuevas clases</p>
+        </div>
+
+        <div th:if="${!classes.isEmpty()}" class="classes-grid">
+            <div th:each="clase : ${classes}" class="class-card">
+                <!-- Header -->
+                <div class="class-header">
+                    <div class="class-type" th:text="${clase.tipoClase}">YOGA</div>
+                    <h3 class="class-name" th:text="${clase.nombre}">Clase de Yoga Matutina</h3>
+                </div>
+
+                <!-- Body -->
+                <div class="class-body">
+                    <div class="class-info-item">
+                        <i class="fas fa-calendar"></i>
+                        <span th:text="${#temporals.format(clase.fechaHora, 'dd/MM/yyyy')}">01/01/2025</span>
+                    </div>
+
+                    <div class="class-info-item">
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${#temporals.format(clase.fechaHora, 'HH:mm')}">10:00</span>
+                        <span th:text="'(' + ${clase.duracionMinutos} + ' min)'"> (60 min)</span>
+                    </div>
+
+                    <div class="class-info-item" th:if="${clase.trainer != null}">
+                        <i class="fas fa-user-tie"></i>
+                        <span th:text="${clase.trainer.user.nombre}">Entrenador</span>
+                    </div>
+
+                    <div class="class-info-item" th:if="${clase.sede != null}">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${clase.sede.nombre}">Sede Principal</span>
+                    </div>
+
+                    <p class="class-description" th:text="${clase.descripcion}">
+                        Descripción de la clase
+                    </p>
+
+                    <!-- Capacity Bar -->
+                    <div class="capacity-text">
+                        Cupos: <strong th:text="${clase.capacidadActual}">5</strong> / 
+                        <span th:text="${clase.capacidadMaxima}">20</span>
+                    </div>
+                    <div class="capacity-bar" th:classappend="${clase.capacidadActual >= clase.capacidadMaxima ? 'capacity-full' : ''}">
+                        <div class="capacity-fill" 
+                             th:style="'width: ' + ${(clase.capacidadActual * 100.0 / clase.capacidadMaxima)} + '%'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="class-footer">
+                    <span class="class-difficulty" 
+                          th:classappend="'difficulty-' + ${clase.nivelDificultad}"
+                          th:text="${clase.nivelDificultad}">
+                        PRINCIPIANTE
+                    </span>
+
+                    <form th:action="@{/client/classes/{id}/book(id=${clase.id})}" 
+                          method="post"
+                          style="margin: 0;">
+                        <button type="submit" 
+                                class="btn-book"
+                                th:disabled="${!clase.tieneCuposDisponibles()}"
+                                th:text="${clase.tieneCuposDisponibles() ? 'Reservar' : 'Lleno'}">
+                            Reservar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

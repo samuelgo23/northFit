@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reservas - NorthFit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #0099cc;
+            --dark-bg: #1a1a2e;
+            --light-bg: #16213e;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .sidebar-title {
+            color: white;
+            font-weight: bold;
+            margin: 10px 0 0 0;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 10px 0;
+        }
+
+        .sidebar-nav a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-mini-card {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-mini-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-mini-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tabs-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .tab-button {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 12px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-button:hover {
+            color: white;
+        }
+
+        .bookings-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .booking-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .booking-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .booking-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 0 5px 0;
+        }
+
+        .booking-type {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .booking-status {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-CONFIRMADA {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+
+        .status-PENDIENTE {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        .status-CANCELADA {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .status-COMPLETADA {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+            border: 1px solid #2196f3;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .detail-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .booking-notes {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 5px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .btn-cancel:hover {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-details {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-details:hover {
+            background: var(--secondary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            color: rgba(0, 212, 255, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .btn-new-booking {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-new-booking:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+            color: white;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <h3 class="sidebar-title">NorthFit</h3>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li>
+                <a th:href="@{/client/dashboard}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/classes}">
+                    <i class="fas fa-calendar-alt"></i> Clases Disponibles
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/bookings}" class="active">
+                    <i class="fas fa-ticket-alt"></i> Mis Reservas
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/memberships}">
+                    <i class="fas fa-crown"></i> Membresías
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/profile}">
+                    <i class="fas fa-user"></i> Mi Perfil
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-ticket-alt"></i>
+                Mis Reservas
+            </h1>
+            <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.7);">
+                Administra todas tus reservas de clases
+            </p>
+
+            <!-- Mini Stats -->
+            <div class="stats-mini">
+                <div class="stat-mini-card">
+                    <div class="stat-mini-value" th:text="${bookings.size()}">0</div>
+                    <div class="stat-mini-label">Total Reservas</div>
+                </div>
+                <div class="stat-mini-card">
+                    <div class="stat-mini-value" 
+                         th:text="${#lists.size(#lists.select(bookings, b -> b.estado.name() == 'CONFIRMADA'))}">0</div>
+                    <div class="stat-mini-label">Confirmadas</div>
+                </div>
+                <div class="stat-mini-card">
+                    <div class="stat-mini-value"
+                         th:text="${#lists.size(#lists.select(bookings, b -> b.estado.name() == 'COMPLETADA'))}">0</div>
+                    <div class="stat-mini-label">Completadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div th:if="${param.success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            ¡Reserva realizada exitosamente!
+        </div>
+
+        <div th:if="${param.cancelled}" class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Reserva cancelada correctamente
+        </div>
+
+        <!-- Tabs Section -->
+        <div class="tabs-section">
+            <!-- Empty State -->
+            <div th:if="${bookings.isEmpty()}" class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h3>No tienes reservas aún</h3>
+                <p>¡Comienza a reservar tus clases favoritas!</p>
+                <a th:href="@{/client/classes}" class="btn-new-booking">
+                    <i class="fas fa-plus"></i>
+                    Explorar Clases
+                </a>
+            </div>
+
+            <!-- Bookings List -->
+            <div th:if="${!bookings.isEmpty()}" class="bookings-list">
+                <div th:each="booking : ${bookings}" class="booking-card">
+                    <div class="booking-header">
+                        <div>
+                            <h3 class="booking-title" th:text="${booking.clase.nombre}">
+                                Clase de Yoga
+                            </h3>
+                            <div class="booking-type" th:text="${booking.clase.tipoClase}">
+                                YOGA
+                            </div>
+                        </div>
+                        <span class="booking-status" 
+                              th:classappend="'status-' + ${booking.estado}">
+                            <span th:text="${booking.estado}">CONFIRMADA</span>
+                        </span>
+                    </div>
+
+                    <div class="booking-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span th:text="${#temporals.format(booking.clase.fechaHora, 'dd/MM/yyyy')}">
+                                01/01/2025
+                            </span>
+                        </div>
+
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(booking.clase.fechaHora, 'HH:mm')}">
+                                10:00
+                            </span>
+                        </div>
+
+                        <div class="detail-item" th:if="${booking.clase.trainer != null}">
+                            <i class="fas fa-user-tie"></i>
+                            <span th:text="${booking.clase.trainer.user.nombre}">
+                                Entrenador
+                            </span>
+                        </div>
+
+                        <div class="detail-item" th:if="${booking.clase.sede != null}">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span th:text="${booking.clase.sede.nombre}">
+                                Sede Principal
+                            </span>
+                        </div>
+
+                        <div class="detail-item">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span th:text="${booking.clase.duracionMinutos} + ' minutos'">
+                                60 minutos
+                            </span>
+                        </div>
+
+                        <div class="detail-item">
+                            <i class="fas fa-signal"></i>
+                            <span th:text="${booking.clase.nivelDificultad}">
+                                INTERMEDIO
+                            </span>
+                        </div>
+                    </div>
+
+                    <div th:if="${booking.notas != null && !booking.notas.isEmpty()}" class="booking-notes">
+                        <strong><i class="fas fa-sticky-note"></i> Notas:</strong>
+                        <span th:text="${booking.notas}">Notas de la reserva</span>
+                    </div>
+
+                    <div class="booking-actions">
+                        <form th:if="${booking.estado.name() == 'CONFIRMADA'}" 
+                              th:action="@{/client/bookings/{id}/cancel(id=${booking.id})}" 
+                              method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('¿Estás seguro de cancelar esta reserva?');">
+                            <button type="submit" class="btn-action btn-cancel">
+                                <i class="fas fa-times"></i> Cancelar Reserva
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div th:if="${!bookings.isEmpty()}" style="margin-top: 30px; text-align: center;">
+                <a th:href="@{/client/classes}" class="btn-new-booking">
+                    <i class="fas fa-plus"></i>
+                    Reservar Otra Clase
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

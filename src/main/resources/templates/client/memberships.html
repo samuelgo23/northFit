@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membresías - NorthFit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #0099cc;
+            --dark-bg: #1a1a2e;
+            --light-bg: #16213e;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .sidebar-title {
+            color: white;
+            font-weight: bold;
+            margin: 10px 0 0 0;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 10px 0;
+        }
+
+        .sidebar-nav a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+        }
+
+        .memberships-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .membership-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .membership-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.4);
+            border-color: var(--primary-color);
+        }
+
+        .membership-card.featured {
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .membership-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            z-index: 1;
+        }
+
+        .membership-header {
+            padding: 40px 30px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 204, 0.2));
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .membership-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .membership-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin: 10px 0;
+        }
+
+        .membership-type {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .membership-price {
+            margin: 20px 0;
+        }
+
+        .price-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .price-currency {
+            font-size: 1.5rem;
+            vertical-align: super;
+        }
+
+        .price-period {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .membership-body {
+            padding: 30px;
+        }
+
+        .membership-description {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .membership-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+        }
+
+        .membership-features li {
+            padding: 12px 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .membership-features i {
+            color: #4caf50;
+            font-size: 1.2rem;
+        }
+
+        .membership-features .not-included i {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .membership-features .not-included {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-select {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-select:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .comparison-note {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .comparison-note i {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <h3 class="sidebar-title">NorthFit</h3>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li>
+                <a th:href="@{/client/dashboard}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/classes}">
+                    <i class="fas fa-calendar-alt"></i> Clases Disponibles
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/bookings}">
+                    <i class="fas fa-ticket-alt"></i> Mis Reservas
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/memberships}" class="active">
+                    <i class="fas fa-crown"></i> Membresías
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/client/profile}">
+                    <i class="fas fa-user"></i> Mi Perfil
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-crown" style="color: var(--primary-color);"></i>
+                Nuestras Membresías
+            </h1>
+            <p class="page-subtitle">
+                Elige el plan que mejor se adapte a tus necesidades
+            </p>
+        </div>
+
+        <!-- Memberships Grid -->
+        <div class="memberships-grid">
+            <div th:each="membership : ${memberships}" 
+                 class="membership-card"
+                 th:classappend="${membership.tipo.name() == 'PREMIUM' ? 'featured' : ''}">
+                
+                <!-- Badge for featured plan -->
+                <div th:if="${membership.tipo.name() == 'PREMIUM'}" class="membership-badge">
+                    ⭐ MÁS POPULAR
+                </div>
+
+                <!-- Header -->
+                <div class="membership-header">
+                    <div class="membership-icon">
+                        <i th:if="${membership.tipo.name() == 'BASICA'}" class="fas fa-dumbbell"></i>
+                        <i th:if="${membership.tipo.name() == 'ESTANDAR'}" class="fas fa-star"></i>
+                        <i th:if="${membership.tipo.name() == 'PREMIUM'}" class="fas fa-crown"></i>
+                        <i th:if="${membership.tipo.name() == 'VIP'}" class="fas fa-gem"></i>
+                    </div>
+                    <h2 class="membership-name" th:text="${membership.nombre}">Básica</h2>
+                    <div class="membership-type" th:text="${membership.tipo}">BÁSICA</div>
+                    
+                    <div class="membership-price">
+                        <span class="price-currency">$</span>
+                        <span class="price-amount" th:text="${#numbers.formatInteger(membership.precio, 0, 'COMMA')}">50,000</span>
+                        <div class="price-period">/ mes</div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="membership-body">
+                    <p class="membership-description" th:text="${membership.descripcion}">
+                        Acceso básico al gimnasio
+                    </p>
+
+                    <ul class="membership-features">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span th:text="${membership.duracionDias} + ' días de duración'">30 días</span>
+                        </li>
+                        
+                        <li th:if="${membership.clasesMensuales != null}">
+                            <i class="fas fa-check-circle"></i>
+                            <span th:text="${membership.clasesMensuales} + ' clases mensuales'">8 clases</span>
+                        </li>
+                        
+                        <li th:if="${membership.clasesMensuales == null}">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Clases grupales ilimitadas</span>
+                        </li>
+                        
+                        <li th:if="${membership.clasesPersonalesIncluidas > 0}">
+                            <i class="fas fa-check-circle"></i>
+                            <span th:text="${membership.clasesPersonalesIncluidas} + ' clases personales incluidas'">
+                                Clases personales
+                            </span>
+                        </li>
+                        
+                        <li th:if="${membership.clasesPersonalesIncluidas == 0}" class="not-included">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Sin clases personales</span>
+                        </li>
+                        
+                        <li th:if="${membership.accesoTodasSedes}">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Acceso a todas las sedes</span>
+                        </li>
+                        
+                        <li th:if="${!membership.accesoTodasSedes}" class="not-included">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Sede única</span>
+                        </li>
+                        
+                        <li th:if="${membership.beneficios != null}">
+                            <i class="fas fa-gift"></i>
+                            <span th:text="${membership.beneficios}">Beneficios adicionales</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn-select" 
+                            onclick="alert('Funcionalidad de compra próximamente. Contacta con recepción.')">
+                        <i class="fas fa-shopping-cart"></i> Seleccionar Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Note -->
+        <div class="comparison-note">
+            <i class="fas fa-info-circle"></i>
+            <h4 style="color: white; margin: 15px 0;">¿Necesitas ayuda para elegir?</h4>
+            <p style="margin: 0;">
+                Contáctanos para recibir asesoría personalizada y encontrar el plan perfecto para ti.
+                <br>
+                <strong style="color: var(--primary-color);">📞 +57 300 123 4567</strong>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
