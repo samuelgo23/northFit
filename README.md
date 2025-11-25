@@ -16,3 +16,11 @@ El objetivo es mejorar la experiencia del cliente y optimizar la operación inte
 </p>
  
 <img src="img/Captura de pantalla 2025-11-25 000136.png" alt="">
+
+contraseñas y users
+========================================
+ADMIN:   admin@northfit.com / admin123
+MANAGER: manager@northfit.com / manager123
+TRAINER: trainer@northfit.com / trainer123
+CLIENT:  client@northfit.com / client123
+========================================
